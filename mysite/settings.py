@@ -75,10 +75,18 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'social_app',       # Nome do banco que você criou
+        'USER': 'root',            # Usuário do MySQL
+        'PASSWORD': 'admin', # Senha do MySQL
+        'HOST': 'localhost',       # Ou IP do servidor
+        'PORT': '3306',            # Porta padrão do MySQL
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
+
 
 
 # Password validation
