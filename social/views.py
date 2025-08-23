@@ -1,19 +1,30 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth import login
+import mysql.connector
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
 
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect ('home')
-        else:
-            form = UserCreationForm()
-        return render(request, 'social/register.html', {'form': form})
-    
+# Função para conectar ao banco
+def get_db_connection():
+    return mysql.connector.connect(
+        host=settings.DATABASES['default']['HOST'],
+        user=settings.DATABASES['default']['USER'],
+        password=settings.DATABASES['default']['PASSWORD'],
+        database=settings.DATABASES['default']['NAME']
+    )
+
 @login_required
 def home(request):
-    return render(request, 'social/home.html')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT p.id, p.content, p.created_at, u.username AS author
+        FROM posts p
+        JOIN auth_user u ON p.author_id = u.id
+        ORDER BY p.created_at DESC
+    """)
+    posts = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render(request, 'social/home.html', {'posts': posts})
