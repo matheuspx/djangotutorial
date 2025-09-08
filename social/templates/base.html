@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Social App{% endblock %}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f4f9;
+        }
+        header {
+            background: #007BFF;
+            padding: 15px;
+            color: white;
+        }
+        header a {
+            color: white;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+        header a:hover {
+            text-decoration: underline;
+        }
+        main {
+            margin: 20px;
+        }
+        .post {
+            background: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .author {
+            font-weight: bold;
+            color: #007BFF;
+        }
+        .date {
+            color: #666;
+            font-size: 0.9em;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        form {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="{% url 'home' %}">Início</a>
+        {% if user.is_authenticated %}
+            <span>Olá, {{ user.username }}</span>
+            <a href="{% url 'create_post' %}">Novo Post</a>
+            <a href="{% url 'logout' %}">Sair</a>

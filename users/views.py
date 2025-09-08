@@ -4,8 +4,18 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic import UpdateView, DeleteView
 from .forms import CustomUserCreationForm
+from django.conf import settings
+import mysql.connector
 
 User = get_user_model()
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host=settings.DATABASES['default']['HOST'],
+        user=settings.DATABASES['default']['USER'],
+        password=settings.DATABASES['default']['PASSWORD'],
+        database=settings.DATABASES['default']['NAME']
+    )
 
 # View de registro de usuário
 def register(request):
@@ -24,7 +34,7 @@ def user_list(request):
     users = User.objects.all()
     return render(request, 'users/user_list.html', {'users': users})
 
-# Edição de usuário
+# Edição de usuárioS
 class UserUpdateView(UpdateView):
     model = User
     fields = ['username', 'email', 'bio', 'birth_date']

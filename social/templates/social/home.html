@@ -1,3 +1,25 @@
 <h1>Bem-vindo, {{ request.user.username }}!</h1>
-<p>Você está logado.</p>
 <a href="{% url 'logout' %}">Sair</a>
+<a href="{% url 'create_post' %}">Novo Post</a>
+
+<h2>Feed</h2>
+{% for post in posts %}
+  <div>
+    <p><strong>{{ post.author }}</strong> - {{ post.created_at }}</p>
+    <p>{{ post.content }}</p>
+    {% if post.image %}
+      <img src="{{ post.image.url }}" width="200">
+    {% endif %}
+    <a href="{% url 'like_post' post.id %}">Curtir ({{ post.likes.count }})</a>
+    <a href="{% url 'edit_post' post.id %}">Editar</a>
+    <a href="{% url 'delete_post' post.id %}">Deletar</a>
+    <form method="POST" action="{% url 'comment_post' post.id %}">
+      {% csrf_token %}
+      <input type="text" name="content" placeholder="Comente aqui">
+      <button type="submit">Comentar</button>
+    </form>
+    {% for comment in post.comments.all %}
+      <p>{{ comment.user }}: {{ comment.content }}</p>
+    {% endfor %}
+  </div>
+{% endfor %}

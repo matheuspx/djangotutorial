@@ -1,0 +1,8 @@
+<h2>Novo Post</h2>
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <textarea name="content" placeholder="Escreva algo..."></textarea>
+  <input type="file" name="image">
+  <button type="submit">Publicar</button>
+</form>
+<a href="{% url 'home' %}">Voltar</a>
