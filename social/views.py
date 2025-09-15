@@ -7,7 +7,7 @@ from .models import Post, Like, Comment, Share
 @login_required
 def home(request):
     posts = Post.objects.all().order_by("-created_at")
-    return render(request, "templates/social/home.html", {"posts": posts})
+    return render(request, "social/home.html", {"posts": posts})
 
 # Criar Post
 @login_required
