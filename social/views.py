@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Post, Like, Comment, Share
 
 # Feed principal
-@login_required
+
 def home(request):
     posts = Post.objects.all().order_by("-created_at")
     return render(request, "social/home.html", {"posts": posts})

@@ -1,0 +1,110 @@
+# =========================================
+# Django & Python
+# =========================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ambiente virtual
+venv/
+.venv/
+env/
+ENV/
+
+# Arquivos de banco de dados locais
+db.sqlite3
+db.sqlite3-journal
+
+# Migrations compiladas (deixa só as pastas, não os .pyc)
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Configurações secretas
+*.env
+.env.*
+
+# Logs e cache
+*.log
+*.pot
+*.py,cover
+.cache/
+*.mo
+*.log
+*.pid
+*.seed
+*.bak
+*.tmp
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Pasta de uploads (mídias)
+media/
+uploads/
+
+# Arquivos de build e compilação
+build/
+dist/
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# IDEs e editores
+.vscode/
+.idea/
+*.iml
+
+# Node.js (caso use React no frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# PyCharm
+*.idea/
+*.iml
+
+# VSCode
+.vscode/
+.history/
+
+# =========================================
+# Django specific
+# =========================================
+# Arquivos estáticos coletados (gerados por collectstatic)
+staticfiles/
+static_root/
+collected_static/
+
+# Backup
+*.bak
+
+# =========================================
+# Sistema Operacional
+# =========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# =========================================
+# Testes / Coverage
+# =========================================
+.coverage
+.tox/
+.nox/
+pytest_cache/
+coverage.xml
+nosetests.xml
+htmlcov/

@@ -9,17 +9,8 @@ from django.conf import settings
 from users.models import perfil
 from .forms import CustomUserCreationForm
 from django.conf import settings
-import mysql.connector
 
 User = get_user_model()
-
-def get_db_connection():
-    return mysql.connector.connect(
-        host=settings.DATABASES['default']['HOST'],
-        user=settings.DATABASES['default']['USER'],
-        password=settings.DATABASES['default']['PASSWORD'],
-        database=settings.DATABASES['default']['NAME']
-    )
 
 # View de criação de perfil
 def create_perfil(request):
