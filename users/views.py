@@ -1,40 +1,55 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy
-from django.views.generic import UpdateView, DeleteView
-from .forms import CustomUserCreationForm
-from django.conf import settings
-
+# users/views.py
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from rest_framework.authtoken.models import Token
+from .serializers import UserSerializer
 
 User = get_user_model()
 
-# View de registro de usuário
-def register(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('login')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
 
-# Listagem de usuários
-@login_required
-def user_list(request):
-    users = User.objects.all()
-    return render(request, 'users/user_list.html', {'users': users})
+class RegisterView(APIView):
+    """Cria um novo usuário"""
+    permission_classes = [permissions.AllowAny]
 
-# Edição de usuárioS
-class UserUpdateView(UpdateView):
-    model = User
-    fields = ['username', 'email', 'bio', 'birth_date']
-    template_name = 'users/user_form.html'
-    success_url = reverse_lazy('user-list')
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                "message": "Usuário registrado com sucesso!",
+                "user": serializer.data,
+                "token": token.key
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Exclusão de usuário
-class UserDeleteView(DeleteView):
-    model = User
-    template_name = 'users/user_confirm_delete.html'
-    success_url = reverse_lazy('user-list')
+
+class LoginView(APIView):
+    """Autentica um usuário existente"""
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            token, _ = Token.objects.get_or_create(user=user)
+            return Response({
+                "message": "Login realizado com sucesso!",
+                "token": token.key
+            }, status=status.HTTP_200_OK)
+        return Response({"error": "Credenciais inválidas."}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class LogoutView(APIView):
+    """Desloga o usuário e deleta o token"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        logout(request)
+        return Response({"message": "Logout realizado com sucesso."}, status=status.HTTP_200_OK)

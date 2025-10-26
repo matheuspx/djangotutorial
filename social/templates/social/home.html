@@ -1,25 +1,362 @@
-<h1>Bem-vindo, {{ request.user.username }}!</h1>
+{% extends 'base.html' %}
 
-<a href="{% url 'create_post' %}">Novo Post</a>
+{% block title %}Home - Rede Social{% endblock %}
 
-<h2>Feed</h2>
-{% for post in posts %}
-  <div>
-    <p><strong>{{ post.author }}</strong> - {{ post.created_at }}</p>
-    <p>{{ post.content }}</p>
-    {% if post.image %}
-      <img src="{{ post.image.url }}" width="200">
+{% block extra_css %}
+<style>
+    /* Criar Post Box */
+    .create-post-box {
+        background-color: white;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-post-box h3 {
+        margin-bottom: 12px;
+        font-size: 18px;
+    }
+
+    .create-post-link {
+        display: block;
+        padding: 12px;
+        background-color: #f0f2f5;
+        border-radius: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #65676b;
+        transition: background-color 0.2s;
+    }
+
+    .create-post-link:hover {
+        background-color: #e4e6eb;
+    }
+
+    /* Post Card */
+    .post-card {
+        background-color: white;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .post-header {
+        padding: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .post-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .author-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .author-info h4 {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+    .post-date {
+        font-size: 13px;
+        color: #65676b;
+    }
+
+    .post-actions-header {
+        display: flex;
+        gap: 8px;
+    }
+
+    .post-actions-header a {
+        padding: 6px 12px;
+        font-size: 13px;
+        text-decoration: none;
+    }
+
+    .post-content {
+        padding: 0 16px 16px 16px;
+    }
+
+    .post-text {
+        font-size: 15px;
+        line-height: 1.5;
+        margin-bottom: 12px;
+        white-space: pre-wrap;
+    }
+
+    .post-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        margin-top: 8px;
+    }
+
+    /* Post Interactions */
+    .post-stats {
+        padding: 0 16px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #65676b;
+        margin-bottom: 8px;
+    }
+
+    .post-interactions {
+        padding: 8px 16px;
+        border-top: 1px solid #e4e6eb;
+        display: flex;
+        gap: 8px;
+    }
+
+    .interaction-btn {
+        flex: 1;
+        padding: 8px;
+        background: none;
+        border: none;
+        color: #65676b;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+        text-decoration: none;
+        text-align: center;
+        display: block;
+    }
+
+    .interaction-btn:hover {
+        background-color: #f0f2f5;
+    }
+
+    .interaction-btn.liked {
+        color: #1877f2;
+    }
+
+    /* Comments Section */
+    .comments-section {
+        border-top: 1px solid #e4e6eb;
+        padding: 12px 16px;
+    }
+
+    .comment {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .comment-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .comment-content {
+        flex: 1;
+        background-color: #f0f2f5;
+        padding: 8px 12px;
+        border-radius: 18px;
+    }
+
+    .comment-author {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    .comment-text {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .comment-form {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .comment-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #e4e6eb;
+        border-radius: 18px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .comment-input:focus {
+        border-color: #1877f2;
+    }
+
+    .comment-submit {
+        padding: 8px 16px;
+        background-color: #1877f2;
+        color: white;
+        border: none;
+        border-radius: 18px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 14px;
+    }
+
+    .comment-submit:hover {
+        background-color: #166fe5;
+    }
+
+    /* Empty State */
+    .empty-state {
+        background-color: white;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        color: #65676b;
+    }
+
+    .empty-state h3 {
+        margin-bottom: 8px;
+        color: #1c1e21;
+    }
+
+    /* Login Prompt */
+    .login-prompt {
+        background-color: white;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .login-prompt h2 {
+        margin-bottom: 12px;
+        color: #1c1e21;
+    }
+
+    .login-prompt p {
+        color: #65676b;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <!-- Create Post Box -->
+    <div class="create-post-box">
+        <h3>O que você está pensando, {{ user.username }}?</h3>
+        <a href="{% url 'create_post' %}" class="create-post-link">
+            Criar nova publicação
+        </a>
+    </div>
+
+    <!-- Posts Feed -->
+    {% if posts %}
+        {% for post in posts %}
+        <div class="post-card">
+            <!-- Post Header -->
+            <div class="post-header">
+                <div class="post-author">
+                    <div class="author-avatar">
+                        {{ post.author.username|first|upper }}
+                    </div>
+                    <div class="author-info">
+                        <h4>{{ post.author.username }}</h4>
+                        <span class="post-date">{{ post.created_at|timesince }} atrás</span>
+                    </div>
+                </div>
+                
+                {% if post.author == user %}
+                <div class="post-actions-header">
+                    <a href="{% url 'edit_post' post.id %}" class="btn btn-secondary">Editar</a>
+                    <a href="{% url 'delete_post' post.id %}" class="btn btn-danger">Deletar</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Post Content -->
+            <div class="post-content">
+                <p class="post-text">{{ post.content }}</p>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="Post image" class="post-image">
+                {% endif %}
+            </div>
+
+            <!-- Post Stats -->
+            <div class="post-stats">
+                <span>{{ post.likes.count }} curtida{{ post.likes.count|pluralize }}</span>
+                <span>{{ post.comments.count }} comentário{{ post.comments.count|pluralize }}</span>
+            </div>
+
+            <!-- Post Interactions -->
+            <div class="post-interactions">
+                <a href="{% url 'like_post' post.id %}" 
+                   class="interaction-btn {% if user in post.likes.all %}liked{% endif %}">
+                    {% if user in post.likes.all %}❤️{% else %}🤍{% endif %} Curtir
+                </a>
+                <a href="#comment-{{ post.id }}" class="interaction-btn">💬 Comentar</a>
+            </div>
+
+            <!-- Comments Section -->
+            {% if post.comments.all %}
+            <div class="comments-section">
+                {% for comment in post.comments.all %}
+                <div class="comment">
+                    <div class="comment-avatar">
+                        {{ comment.user.username|first|upper }}
+                    </div>
+                    <div class="comment-content">
+                        <div class="comment-author">{{ comment.user.username }}</div>
+                        <div class="comment-text">{{ comment.content }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Comment Form -->
+            <div class="comments-section">
+                <form method="POST" action="{% url 'comment_post' post.id %}" class="comment-form" id="comment-{{ post.id }}">
+                    {% csrf_token %}
+                    <input type="text" name="content" class="comment-input" placeholder="Escreva um comentário..." required>
+                    <button type="submit" class="comment-submit">Enviar</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <h3>Nenhuma publicação ainda</h3>
+            <p>Seja o primeiro a compartilhar algo!</p>
+        </div>
     {% endif %}
-    <a href="{% url 'like_post' post.id %}">Curtir ({{ post.likes.count }})</a>
-    <a href="{% url 'edit_post' post.id %}">Editar</a>
-    <a href="{% url 'delete_post' post.id %}">Deletar</a>
-    <form method="POST" action="{% url 'comment_post' post.id %}">
-      {% csrf_token %}
-      <input type="text" name="content" placeholder="Comente aqui">
-      <button type="submit">Comentar</button>
-    </form>
-    {% for comment in post.comments.all %}
-      <p>{{ comment.user }}: {{ comment.content }}</p>
-    {% endfor %}
-  </div>
-{% endfor %}
+
+{% else %}
+    <!-- Login Prompt -->
+    <div class="login-prompt">
+        <h2>Bem-vindo à SocialNet</h2>
+        <p>Faça login para ver as publicações e interagir com seus amigos.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">Entrar agora</a>
+    </div>
+{% endif %}
+{% endblock %}

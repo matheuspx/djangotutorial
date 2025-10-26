@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'social',
     'users',
     'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
